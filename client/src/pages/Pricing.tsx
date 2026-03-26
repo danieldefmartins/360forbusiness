@@ -1,13 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Link } from "wouter";
 import {
   Check,
-  X,
   ArrowRight,
   Sparkles,
   Calculator,
@@ -19,89 +17,60 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 
-const plans = [
-  {
-    name: "Starter CRM",
-    price: 79,
-    description: "Get started with our affordable Starter Plan for essential features and seamless functionality.",
-    badge: null,
-    badgeColor: "bg-orange-500",
-    cardStyle: "bg-white border-2 border-border",
-    features: [
-      { text: "All The Tools To Capture More Leads", included: true },
-      { text: "Nurture & Close Leads Into Customers", included: true },
-      { text: "Full Online Booking, Pipelines, Social Calendar, Website Builder, And More!", included: true },
-      { text: "Unlimited Contacts & Users", included: true },
-      { text: "Setup Up to Three Sub-Accounts", included: true },
-      { text: "Email & SMS Marketing", included: true },
-      { text: "Reputation Management", included: true },
-      { text: "API Access", included: false },
-      { text: "Unlimited Sub-Accounts", included: false },
-      { text: "Branded Desktop App", included: false },
-    ],
-    cta: "Start A 14 Day Free Trial",
-    ctaStyle: "bg-orange-500 hover:bg-orange-600 text-white",
-  },
-  {
-    name: "Pro CRM",
-    price: 149,
-    description: "Boundless Features, Limitless Potential. Choose Our Pro Plan For Unlimited Possibilities.",
-    badge: "MOST POPULAR",
-    badgeColor: "bg-green-500",
-    cardStyle: "bg-purple-900 text-white border-2 border-purple-700",
-    features: [
-      { text: "Everything In Starter", included: true, highlight: true },
-      { text: "API Access – Integrate With Anything", included: true },
-      { text: "Unlimited Sub-Accounts as Many Client Accounts as You Need for One Price!", included: true },
-      { text: "Branded Desktop App – Custom Domains And Complete Control Over The Look And Feel Of The Platform!", included: true },
-      { text: "Priority Support", included: true },
-      { text: "Advanced Reporting & Analytics", included: true },
-      { text: "White Label Options", included: true },
-      { text: "Custom Integrations", included: true },
-      { text: "Dedicated Account Manager", included: true },
-      { text: "SLA Guarantee", included: true },
-    ],
-    cta: "Start A 14 Day Free Trial",
-    ctaStyle: "bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white",
-  },
+const features = [
+  { text: "All The Tools To Capture More Leads", included: true },
+  { text: "Nurture & Close Leads Into Customers", included: true },
+  { text: "Full Online Booking, Pipelines, Social Calendar, Website Builder, And More!", included: true },
+  { text: "Unlimited Contacts & Users", included: true },
+  { text: "Unlimited Sub-Accounts", included: true },
+  { text: "Email & SMS Marketing", included: true },
+  { text: "Reputation Management", included: true },
+  { text: "API Access – Integrate With Anything", included: true },
+  { text: "Branded Desktop App", included: true },
+  { text: "Priority Support", included: true },
+  { text: "Advanced Reporting & Analytics", included: true },
+  { text: "White Label Options", included: true },
+  { text: "Custom Integrations", included: true },
+  { text: "Dedicated Account Manager", included: true },
+  { text: "SLA Guarantee", included: true },
 ];
 
-const comparisonFeatures = [
+const allFeatures = [
   { category: "Lead Capture", features: [
-    { name: "Landing Pages", starter: true, pro: true },
-    { name: "Forms & Surveys", starter: true, pro: true },
-    { name: "Calendar Booking", starter: true, pro: true },
-    { name: "Call Tracking", starter: true, pro: true },
+    "Landing Pages",
+    "Forms & Surveys",
+    "Calendar Booking",
+    "Call Tracking",
   ]},
   { category: "Automation", features: [
-    { name: "Email Sequences", starter: true, pro: true },
-    { name: "SMS Sequences", starter: true, pro: true },
-    { name: "Workflow Builder", starter: true, pro: true },
-    { name: "AI Automation", starter: "Limited", pro: true },
+    "Email Sequences",
+    "SMS Sequences",
+    "Workflow Builder",
+    "AI Automation",
   ]},
   { category: "Sales Tools", features: [
-    { name: "Pipeline Management", starter: true, pro: true },
-    { name: "Proposals & Invoices", starter: true, pro: true },
-    { name: "Payment Processing", starter: true, pro: true },
-    { name: "Advanced Reporting", starter: false, pro: true },
+    "Pipeline Management",
+    "Proposals & Invoices",
+    "Payment Processing",
+    "Advanced Reporting",
   ]},
   { category: "Marketing", features: [
-    { name: "Email Marketing", starter: true, pro: true },
-    { name: "SMS Marketing", starter: true, pro: true },
-    { name: "Social Media Scheduler", starter: true, pro: true },
-    { name: "Reputation Management", starter: true, pro: true },
+    "Email Marketing",
+    "SMS Marketing",
+    "Social Media Scheduler",
+    "Reputation Management",
   ]},
   { category: "Platform", features: [
-    { name: "Sub-Accounts", starter: "Up to 3", pro: "Unlimited" },
-    { name: "API Access", starter: false, pro: true },
-    { name: "White Label", starter: false, pro: true },
-    { name: "Custom Domains", starter: true, pro: true },
+    "Unlimited Sub-Accounts",
+    "API Access",
+    "White Label",
+    "Custom Domains",
   ]},
   { category: "Support", features: [
-    { name: "Email Support", starter: true, pro: true },
-    { name: "Chat Support", starter: true, pro: true },
-    { name: "Priority Support", starter: false, pro: true },
-    { name: "Dedicated Account Manager", starter: false, pro: true },
+    "Email Support",
+    "Chat Support",
+    "Priority Support",
+    "Dedicated Account Manager",
   ]},
 ];
 
@@ -117,15 +86,20 @@ const toolSavings = [
 ];
 
 export default function Pricing() {
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
   const [selectedTools, setSelectedTools] = useState<string[]>(
     toolSavings.map(t => t.name)
   );
+
+  const price = billingCycle === "monthly" ? 99 : 997;
+  const monthlyEquivalent = billingCycle === "yearly" ? Math.round(997 / 12) : 99;
+  const yearlySavings = (99 * 12) - 997;
 
   const totalToolsCost = toolSavings
     .filter(t => selectedTools.includes(t.name))
     .reduce((sum, t) => sum + t.cost, 0);
 
-  const savings = totalToolsCost - 79;
+  const savings = totalToolsCost - 99;
 
   const toggleTool = (toolName: string) => {
     setSelectedTools(prev =>
@@ -155,75 +129,90 @@ export default function Pricing() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 One Platform.
                 <br />
-                <span className="text-orange-400">Two Perfect Plans.</span>
+                <span className="text-orange-400">One Powerful Plan.</span>
               </h1>
               <p className="text-xl md:text-2xl text-purple-100 mb-6 max-w-2xl mx-auto">
-                Choose the plan that fits your business. No hidden fees. Cancel anytime.
+                Everything you need to grow your business. No hidden fees. Cancel anytime.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Pricing Cards */}
+        {/* Pricing Card */}
         <section className="py-20 bg-background -mt-10">
           <div className="container">
-            <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-              {plans.map((plan, index) => (
-                <Card
-                  key={index}
-                  className={`relative overflow-hidden ${plan.cardStyle}`}
-                >
-                  {plan.badge && (
-                    <div className={`absolute top-4 right-4 ${plan.badgeColor} text-white text-xs font-bold px-3 py-1 rounded-full`}>
-                      {plan.badge}
-                    </div>
-                  )}
-                  <CardHeader className="pb-4">
-                    <div className={`inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-4 ${
-                      index === 0 ? "bg-orange-500 text-white" : "bg-green-500 text-white"
-                    }`}>
-                      {plan.name.toUpperCase().replace(" CRM", "")}
-                    </div>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-5xl font-bold">${plan.price}</span>
-                      <span className={`text-lg ${index === 1 ? "text-purple-200" : "text-muted-foreground"}`}>/mo</span>
-                    </div>
-                    <p className={`mt-4 ${index === 1 ? "text-purple-200" : "text-muted-foreground"}`}>
-                      {plan.description}
+            <div className="max-w-2xl mx-auto">
+              {/* Billing Toggle */}
+              <div className="flex justify-center mb-10">
+                <div className="inline-flex items-center bg-purple-100 rounded-full p-1">
+                  <button
+                    onClick={() => setBillingCycle("monthly")}
+                    className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                      billingCycle === "monthly"
+                        ? "bg-purple-900 text-white shadow-md"
+                        : "text-purple-700 hover:text-purple-900"
+                    }`}
+                  >
+                    Monthly
+                  </button>
+                  <button
+                    onClick={() => setBillingCycle("yearly")}
+                    className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all ${
+                      billingCycle === "yearly"
+                        ? "bg-purple-900 text-white shadow-md"
+                        : "text-purple-700 hover:text-purple-900"
+                    }`}
+                  >
+                    Yearly
+                    <span className="ml-2 text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">
+                      Save ${yearlySavings}
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <Card className="relative overflow-hidden bg-purple-900 text-white border-2 border-purple-700">
+                <div className="absolute top-4 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  ALL-IN-ONE
+                </div>
+                <CardHeader className="pb-4">
+                  <div className="inline-block px-4 py-1.5 rounded-full text-sm font-semibold mb-4 bg-orange-500 text-white w-fit">
+                    PROFESSIONAL CRM
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-5xl font-bold">${billingCycle === "monthly" ? price : monthlyEquivalent}</span>
+                    <span className="text-lg text-purple-200">/mo</span>
+                  </div>
+                  {billingCycle === "yearly" && (
+                    <p className="text-purple-300 text-sm mt-1">
+                      Billed annually at ${price}/year
                     </p>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <div className={`border-t ${index === 1 ? "border-purple-700" : "border-border"} my-6`} />
-                    <ul className="space-y-4 mb-8">
-                      {plan.features.map((feature, i) => (
-                        <li key={i} className="flex items-start gap-3">
-                          {feature.included ? (
-                            <Check className={`h-5 w-5 mt-0.5 flex-shrink-0 ${
-                              index === 1 ? "text-green-400" : "text-orange-500"
-                            }`} />
-                          ) : (
-                            <X className="h-5 w-5 mt-0.5 flex-shrink-0 text-gray-400" />
-                          )}
-                          <span className={`${
-                            !feature.included ? "text-gray-400" : ""
-                          } ${(feature as any).highlight ? "font-semibold" : ""}`}>
-                            {feature.text}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                    <Button
-                      size="lg"
-                      className={`w-full text-lg py-6 ${plan.ctaStyle}`}
-                      asChild
-                    >
-                      <a href="https://app.360forbusiness.com" target="_blank" rel="noopener noreferrer">
-                        {plan.cta}
-                      </a>
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
+                  )}
+                  <p className="mt-4 text-purple-200">
+                    Boundless Features, Limitless Potential. Everything You Need For One Price.
+                  </p>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div className="border-t border-purple-700 my-6" />
+                  <ul className="space-y-4 mb-8">
+                    {features.map((feature, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <Check className="h-5 w-5 mt-0.5 flex-shrink-0 text-green-400" />
+                        <span>{feature.text}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Button
+                    size="lg"
+                    className="w-full text-lg py-6 bg-gradient-to-r from-green-400 to-green-500 hover:from-green-500 hover:to-green-600 text-white"
+                    asChild
+                  >
+                    <a href="https://app.360forbusiness.com" target="_blank" rel="noopener noreferrer">
+                      Start A 14 Day Free Trial
+                    </a>
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
@@ -288,17 +277,17 @@ export default function Pricing() {
                         <p className="text-4xl font-bold text-purple-900 mb-6 line-through decoration-red-500">
                           ${totalToolsCost}
                         </p>
-                        
+
                         <div className="border-t border-purple-200 my-6" />
-                        
+
                         <p className="text-sm text-purple-600 font-semibold mb-2">
                           WITH 360 FOR BUSINESS
                         </p>
                         <p className="text-5xl font-bold text-purple-900 mb-2">
-                          $79
+                          $99
                         </p>
                         <p className="text-purple-600 mb-6">per month</p>
-                        
+
                         <div className="bg-green-100 rounded-xl p-4 mb-6">
                           <p className="text-sm text-green-700 font-semibold">
                             MONTHLY SAVINGS
@@ -310,7 +299,7 @@ export default function Pricing() {
                             That's ${(savings > 0 ? savings : 0) * 12}/year!
                           </p>
                         </div>
-                        
+
                         <Button
                           size="lg"
                           className="w-full bg-orange-500 hover:bg-orange-600 text-white"
@@ -330,77 +319,35 @@ export default function Pricing() {
           </div>
         </section>
 
-        {/* Feature Comparison Table */}
+        {/* All Features */}
         <section className="py-20 bg-background">
           <div className="container">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Detailed Feature Comparison
+                Everything Included
               </h2>
               <div className="section-divider mx-auto mb-6" />
               <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                Compare our plans side by side to find the perfect fit for your business.
+                One plan with every feature you need to grow your business.
               </p>
             </div>
 
-            <div className="max-w-4xl mx-auto overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-4 px-4 font-semibold">Feature</th>
-                    <th className="text-center py-4 px-4 font-semibold">
-                      <div className="flex flex-col items-center">
-                        <span>Starter</span>
-                        <span className="text-orange-500 font-bold">$79/mo</span>
-                      </div>
-                    </th>
-                    <th className="text-center py-4 px-4 font-semibold">
-                      <div className="flex flex-col items-center">
-                        <span>Pro</span>
-                        <span className="text-purple-600 font-bold">$149/mo</span>
-                      </div>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {comparisonFeatures.map((category, catIndex) => (
-                    <>
-                      <tr key={`cat-${catIndex}`} className="bg-purple-50">
-                        <td colSpan={3} className="py-3 px-4 font-semibold text-purple-900">
-                          {category.category}
-                        </td>
-                      </tr>
+            <div className="max-w-4xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {allFeatures.map((category, catIndex) => (
+                <Card key={catIndex}>
+                  <CardContent className="p-6">
+                    <h3 className="font-semibold text-lg mb-4 text-purple-900">{category.category}</h3>
+                    <ul className="space-y-3">
                       {category.features.map((feature, featIndex) => (
-                        <tr key={`feat-${catIndex}-${featIndex}`} className="border-b border-border/50">
-                          <td className="py-3 px-4">{feature.name}</td>
-                          <td className="py-3 px-4 text-center">
-                            {typeof feature.starter === "boolean" ? (
-                              feature.starter ? (
-                                <Check className="h-5 w-5 text-green-500 mx-auto" />
-                              ) : (
-                                <X className="h-5 w-5 text-gray-300 mx-auto" />
-                              )
-                            ) : (
-                              <span className="text-sm text-muted-foreground">{feature.starter}</span>
-                            )}
-                          </td>
-                          <td className="py-3 px-4 text-center">
-                            {typeof feature.pro === "boolean" ? (
-                              feature.pro ? (
-                                <Check className="h-5 w-5 text-green-500 mx-auto" />
-                              ) : (
-                                <X className="h-5 w-5 text-gray-300 mx-auto" />
-                              )
-                            ) : (
-                              <span className="text-sm font-medium text-purple-600">{feature.pro}</span>
-                            )}
-                          </td>
-                        </tr>
+                        <li key={featIndex} className="flex items-center gap-2">
+                          <Check className="h-4 w-4 text-green-500 flex-shrink-0" />
+                          <span className="text-sm">{feature}</span>
+                        </li>
                       ))}
-                    </>
-                  ))}
-                </tbody>
-              </table>
+                    </ul>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
 
             <div className="text-center mt-12">
@@ -432,11 +379,11 @@ export default function Pricing() {
               {[
                 {
                   q: "Is there a free trial?",
-                  a: "Yes! We offer a 14-day free trial on all plans. No credit card required to start.",
+                  a: "Yes! We offer a 14-day free trial. No credit card required to start.",
                 },
                 {
-                  q: "Can I switch plans later?",
-                  a: "Absolutely. You can upgrade or downgrade your plan at any time. Changes take effect on your next billing cycle.",
+                  q: "What's included in the plan?",
+                  a: "Everything. Our Professional CRM plan includes all features — CRM, email & SMS marketing, landing pages, booking, pipelines, reputation management, API access, white label, and more.",
                 },
                 {
                   q: "What payment methods do you accept?",
@@ -444,11 +391,11 @@ export default function Pricing() {
                 },
                 {
                   q: "Is there a contract or commitment?",
-                  a: "No long-term contracts. All plans are month-to-month and you can cancel anytime.",
+                  a: "No long-term contracts. Monthly plans are month-to-month and you can cancel anytime. Annual plans are billed once per year.",
                 },
                 {
-                  q: "Do you offer discounts for annual billing?",
-                  a: "Yes! Contact our sales team to learn about annual billing discounts and custom enterprise pricing.",
+                  q: "How much do I save with annual billing?",
+                  a: `Annual billing is $997/year instead of $${99 * 12}/year — saving you $${yearlySavings} per year.`,
                 },
               ].map((faq, index) => (
                 <Card key={index}>
