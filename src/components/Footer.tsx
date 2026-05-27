@@ -49,20 +49,14 @@ export default function Footer({
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
             {/* Brand */}
             <div className="sm:col-span-2 lg:col-span-1">
-              <Link
-                href={`/${locale}/`}
-                className="flex items-center gap-3 mb-5"
-              >
+              <Link href={`/${locale}/`} className="inline-block mb-5">
                 <Image
-                  src="/images/logos/logo-full-color.png"
+                  src="/images/logos/logo-horizontal-dark.png"
                   alt="360 For Business"
-                  width={40}
-                  height={40}
-                  className="rounded-lg"
+                  width={160}
+                  height={43}
+                  className="h-10 w-auto"
                 />
-                <span className="text-white font-bold text-lg">
-                  360 <span className="text-gold-400">For Business</span>
-                </span>
               </Link>
               <p className="text-slate-400 text-sm leading-relaxed mb-6">
                 {dict.footer.tagline}

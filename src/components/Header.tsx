@@ -52,19 +52,14 @@ export default function Header({
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Logo */}
-            <Link href={`/${locale}/`} className="flex items-center gap-3 shrink-0">
+            <Link href={`/${locale}/`} className="shrink-0">
               <Image
-                src="/images/logos/logo-full-color.png"
+                src="/images/logos/logo-horizontal-dark.png"
                 alt="360 For Business"
-                width={44}
-                height={44}
-                className="w-10 h-10 sm:w-11 sm:h-11 rounded-lg"
+                width={180}
+                height={48}
+                className="h-9 sm:h-11 w-auto"
               />
-              <div className="hidden sm:block">
-                <span className="text-white font-bold text-lg leading-tight block">
-                  360 <span className="text-gold-400">For Business</span>
-                </span>
-              </div>
             </Link>
 
             {/* Desktop nav */}
