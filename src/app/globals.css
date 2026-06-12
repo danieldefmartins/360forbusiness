@@ -836,3 +836,66 @@ body {
   margin: 0 auto 1.75rem;
   line-height: 1.6;
 }
+
+/* Intake — language picker */
+.intake-langs {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+.intake-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 2px solid var(--color-slate-200);
+  background: white;
+  color: var(--color-slate-600);
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.18s ease;
+}
+.intake-lang:hover {
+  border-color: var(--color-purple-300);
+  color: var(--color-purple-700);
+}
+.intake-lang-on {
+  border-color: var(--color-purple-600);
+  background: var(--color-purple-50);
+  color: var(--color-purple-800);
+}
+
+/* Intake — brand color swatches */
+.intake-colors {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.intake-color-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.intake-color-swatch {
+  width: 46px;
+  height: 46px;
+  flex-shrink: 0;
+  padding: 0;
+  border: 2px solid var(--color-slate-200);
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+}
+.intake-color-swatch::-webkit-color-swatch-wrapper {
+  padding: 3px;
+}
+.intake-color-swatch::-webkit-color-swatch {
+  border: none;
+  border-radius: 6px;
+}
+.intake-color-row .form-input {
+  flex: 1;
+}

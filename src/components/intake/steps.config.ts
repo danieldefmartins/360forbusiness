@@ -20,13 +20,18 @@ export type FieldType =
   | "multiselect"
   | "yesno"
   | "file"
-  | "people";
+  | "people"
+  | "areas"
+  | "colors"
+  | "logins"
+  | "list";
 
 export interface FieldConfig {
   id: string; // must match a key in content.fields
   type: FieldType;
   optional?: boolean; // default false (required)
   half?: boolean; // render two-up on wider screens
+  max?: number; // file fields: max number of uploads
   showIf?: (a: Answers) => boolean;
 }
 
@@ -85,7 +90,7 @@ export const STEPS: StepConfig[] = [
       // Service area: ZIP + a "how far" picker + optional specific areas (pick, don't type)
       { id: "service_zip", type: "text", half: true },
       { id: "service_radius", type: "select", half: true },
-      { id: "service_areas", type: "text", optional: true },
+      { id: "service_areas", type: "areas", optional: true },
     ],
   },
 
@@ -134,6 +139,8 @@ export const STEPS: StepConfig[] = [
       { id: "linkedin", type: "text", optional: true, half: true },
       { id: "google_business", type: "select", optional: true, half: true },
       { id: "reviews_status", type: "text", optional: true },
+      // Optional login access so the agency can post/manage (handled securely — see edge fn)
+      { id: "social_logins", type: "logins", optional: true },
     ],
   },
 
@@ -141,10 +148,11 @@ export const STEPS: StepConfig[] = [
     id: "assets",
     icon: "ImagePlus",
     fields: [
-      { id: "media_files", type: "file", optional: true },
+      { id: "media_files", type: "file", optional: true, max: 5 },
       { id: "media_links", type: "textarea", optional: true },
       { id: "logo_files", type: "file", optional: true },
-      { id: "brand_colors", type: "text", optional: true },
+      { id: "brand_colors", type: "colors", optional: true },
+      { id: "brand_fonts", type: "text", optional: true },
     ],
   },
 
@@ -204,8 +212,10 @@ export const STEPS: StepConfig[] = [
       { id: "budget", type: "select", half: true },
       { id: "timeline", type: "select", half: true },
       { id: "current_marketing", type: "multiselect" },
-      { id: "biggest_challenge", type: "textarea" },
-      { id: "competitors", type: "textarea", optional: true },
+      { id: "challenge_options", type: "multiselect" },
+      { id: "biggest_challenge", type: "textarea", optional: true },
+      { id: "competitors", type: "list", optional: true, max: 5 },
+      { id: "success_options", type: "multiselect", optional: true },
       { id: "success_vision", type: "textarea", optional: true },
     ],
   },

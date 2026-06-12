@@ -2,11 +2,15 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
 import { Globe } from "lucide-react";
 
 export default function LanguageSwitcher({ current }: { current: Locale }) {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  // keep the current page when switching language: /en/start/ -> /pt/start/
+  const rest = pathname.replace(/^\/(en|pt|es)(\/|$)/, "/");
 
   return (
     <div className="relative">
@@ -25,7 +29,7 @@ export default function LanguageSwitcher({ current }: { current: Locale }) {
             {locales.map((locale) => (
               <Link
                 key={locale}
-                href={`/${locale}/`}
+                href={`/${locale}${rest}`}
                 onClick={() => setOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 text-sm font-medium transition-colors ${
                   locale === current

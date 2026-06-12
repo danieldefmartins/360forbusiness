@@ -32,7 +32,7 @@ import {
   PartyPopper as Celebrate,
   type LucideIcon,
 } from "lucide-react";
-import type { Locale } from "@/i18n/config";
+import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
 import { getIntakeContent } from "./content";
 import { STEPS, visibleFields, isStepComplete, type FieldConfig } from "./steps.config";
 import { useIntakeStore } from "./useIntakeStore";
@@ -131,6 +131,20 @@ export default function IntakeWizard({ locale }: { locale: Locale }) {
 
   return (
     <div className="intake-shell form-360">
+      {/* Language picker — switching keeps saved progress (same localStorage key) */}
+      <div className="intake-langs">
+        {locales.map((loc) => (
+          <Link
+            key={loc}
+            href={`/${loc}/start/`}
+            className={`intake-lang ${loc === locale ? "intake-lang-on" : ""}`}
+          >
+            <span aria-hidden>{localeFlags[loc]}</span>
+            {localeNames[loc]}
+          </Link>
+        ))}
+      </div>
+
       {/* Resume banner */}
       {showResume && store.hasSavedProgress && (
         <div className="intake-resume">
@@ -307,6 +321,16 @@ function StepFields({
               optionalLabel={c.nav.optional}
               selectHint={c.nav.selectHint}
               addPersonLabel={c.package.addPerson}
+              answers={answers}
+              radiusOptions={c.fields.service_radius?.options}
+              areaText={{
+                prompt: c.nav.areaPrompt,
+                loading: c.nav.areaLoading,
+                add: c.nav.areaAdd,
+                detected: c.nav.areaDetected,
+              }}
+              fileMaxNote={c.nav.fileMaxNote}
+              addAnotherLabel={c.nav.addAnother}
             />
           </div>
         );
