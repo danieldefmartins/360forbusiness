@@ -81,7 +81,7 @@ export default function Header({
                 <LanguageSwitcher current={locale} />
               </div>
               <Link
-                href={`/${locale}/contact/`}
+                href={`/${locale}/start/`}
                 className="hidden md:inline-flex items-center gap-2 bg-cta hover:bg-cta-dark text-white font-bold px-6 py-2.5 rounded-lg transition-colors text-sm"
               >
                 {dict.nav.getStarted}
@@ -120,7 +120,7 @@ export default function Header({
                 <LanguageSwitcher current={locale} />
               </div>
               <Link
-                href={`/${locale}/contact/`}
+                href={`/${locale}/start/`}
                 onClick={() => setMobileOpen(false)}
                 className="mt-4 flex items-center justify-center gap-2 bg-cta hover:bg-cta-dark text-white font-bold px-8 py-3.5 rounded-lg transition-colors w-full text-base"
               >
