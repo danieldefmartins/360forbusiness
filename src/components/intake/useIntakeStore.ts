@@ -4,6 +4,10 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase, INTAKE_TABLE } from "@/lib/supabase";
 import type { Answers } from "./steps.config";
 
+/* Hydrating client state from localStorage requires setState inside a mount
+   effect — the persisted values don't exist during the static prerender. */
+/* eslint-disable react-hooks/set-state-in-effect */
+
 export type SaveStatus = "idle" | "saving" | "saved" | "error";
 
 const LS_KEY = "tfb_intake_v1";
@@ -61,13 +65,18 @@ export function useIntakeStore(locale: string): IntakeStore {
   const [hasSavedProgress, setHasSavedProgress] = useState(false);
 
   // Keep latest values for use inside async callbacks without stale closures.
+  // Synced in an effect (not during render) to satisfy the react-hooks rules.
   const answersRef = useRef<Answers>(answers);
   const stepRef = useRef(stepIndex);
-  answersRef.current = answers;
-  stepRef.current = stepIndex;
+  useEffect(() => {
+    answersRef.current = answers;
+    stepRef.current = stepIndex;
+  }, [answers, stepIndex]);
 
   // Hydrate from localStorage on mount (browser-only — window/localStorage are
   // unavailable during the static prerender, per Next static-export docs).
+  // setState-in-effect is the intended pattern here: the persisted values can
+  // only be read in the browser, after the prerendered HTML hydrates.
   useEffect(() => {
     const existing = loadLocal();
     if (existing?.id) {
@@ -83,7 +92,6 @@ export function useIntakeStore(locale: string): IntakeStore {
       );
     }
     setHydrated(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Instant local persistence on every change (so nothing is ever lost on refresh).
