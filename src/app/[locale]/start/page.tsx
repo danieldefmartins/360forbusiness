@@ -18,7 +18,7 @@ export default async function StartPage({
   return (
     <>
       {/* ═══════════════════════════ HERO ═══════════════════════════ */}
-      <section className="relative bg-animated-gradient pt-32 sm:pt-40 pb-28 sm:pb-36 overflow-hidden">
+      <section className="relative bg-animated-gradient pt-28 sm:pt-32 pb-14 sm:pb-16 overflow-hidden">
         <div className="absolute inset-0 opacity-[0.04]">
           <div
             className="absolute inset-0"
@@ -48,11 +48,9 @@ export default async function StartPage({
       </section>
 
       {/* ═══════════════════════════ WIZARD ═══════════════════════════ */}
-      <section className="bg-slate-50 pb-24 sm:pb-32">
+      <section className="bg-slate-50 pt-10 sm:pt-12 pb-24 sm:pb-32">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-12">
-          <div className="-mt-20">
-            <IntakeWizard locale={locale} />
-          </div>
+          <IntakeWizard locale={locale} />
         </div>
       </section>
     </>
