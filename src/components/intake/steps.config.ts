@@ -82,7 +82,10 @@ export const STEPS: StepConfig[] = [
       // …plus a free-text box for anything not on the list (hidden for "other").
       { id: "offerings", type: "text", optional: true, showIf: (a) => !!a.category && a.category !== "other" },
       { id: "usp", type: "textarea" },
-      { id: "service_area", type: "text" },
+      // Service area: ZIP + a "how far" picker + optional specific areas (pick, don't type)
+      { id: "service_zip", type: "text", half: true },
+      { id: "service_radius", type: "select", half: true },
+      { id: "service_areas", type: "text", optional: true },
     ],
   },
 
