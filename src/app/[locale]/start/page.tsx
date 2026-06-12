@@ -1,9 +1,41 @@
+import type { Metadata } from "next";
 import { locales, type Locale } from "@/i18n/config";
 import { getIntakeContent } from "@/components/intake/content";
 import IntakeWizard from "@/components/intake/IntakeWizard";
 
 export function generateStaticParams() {
   return locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const c = getIntakeContent(locale as Locale);
+  const url = `https://360forbusiness.com/${locale}/start/`;
+  return {
+    title: `${c.title} | 360 For Business`,
+    description: c.subtitle,
+    alternates: { canonical: url },
+    openGraph: {
+      title: c.title,
+      description: c.subtitle,
+      url,
+      siteName: "360 For Business",
+      images: [
+        { url: "/og/start.png", width: 1200, height: 630, alt: "360 For Business — Start your marketing strategy" },
+      ],
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: c.title,
+      description: c.subtitle,
+      images: ["/og/start.png"],
+    },
+  };
 }
 
 export default async function StartPage({
