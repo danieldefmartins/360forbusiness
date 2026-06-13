@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   LayoutGrid,
@@ -33,14 +33,18 @@ import {
   Share2,
   ShieldCheck,
   MessageSquare,
+  LogIn,
+  Save,
   PartyPopper as Celebrate,
   type LucideIcon,
 } from "lucide-react";
 import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
+import { supabase } from "@/lib/supabase";
 import { getIntakeContent } from "./content";
 import { STEPS, visibleFields, isStepComplete, sectionOrder, type FieldConfig } from "./steps.config";
 import { useIntakeStore } from "./useIntakeStore";
 import FieldRenderer from "./FieldRenderer";
+import AuthPanel from "./AuthPanel";
 
 const STEP_ICONS: Record<string, LucideIcon> = {
   LayoutGrid,
@@ -82,6 +86,44 @@ export default function IntakeWizard({ locale }: { locale: Locale }) {
   const [showResume, setShowResume] = useState(true);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // ── Auth (passwordless email code) so clients can finish later on any device ──
+  const a = c.auth as Record<string, string>;
+  const [authEmail, setAuthEmail] = useState<string | null>(null);
+  const [authModal, setAuthModal] = useState<null | "save" | "login">(null);
+  const [authToast, setAuthToast] = useState("");
+
+  async function resumeFromServer() {
+    const { data, error } = await supabase.rpc("get_my_intake");
+    if (error || !data || !data.length) return false;
+    const row = data[0] as { id: string; answers: Record<string, unknown>; current_step: number };
+    store.loadFrom(row.id, row.answers ?? {}, row.current_step ?? 0);
+    setAuthToast(a.resumed);
+    return true;
+  }
+
+  async function handleAuthed() {
+    if (authModal === "save") await store.commit("in_progress");
+    else await resumeFromServer();
+  }
+
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getSession().then(({ data }) => {
+      if (!active) return;
+      const em = data.session?.user?.email ?? null;
+      setAuthEmail(em);
+      if (em && !store.hasSavedProgress) void resumeFromServer();
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_evt, session) => {
+      setAuthEmail(session?.user?.email ?? null);
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [store.hydrated]);
 
   const step = STEPS[stepIndex];
   const stepText = c.steps[stepIndex];
@@ -155,6 +197,29 @@ export default function IntakeWizard({ locale }: { locale: Locale }) {
           </Link>
         ))}
       </div>
+
+      {/* Login / account bar */}
+      <div className="intake-authbar">
+        {authEmail ? (
+          <span>
+            {a.loggedInAs} <strong>{authEmail}</strong>{" · "}
+            <button className="intake-link" onClick={() => supabase.auth.signOut()}>
+              {a.logout}
+            </button>
+          </span>
+        ) : (
+          <button className="intake-link" onClick={() => setAuthModal("login")}>
+            <LogIn className="w-3.5 h-3.5" />
+            {a.loginLink}
+          </button>
+        )}
+      </div>
+
+      {authToast && (
+        <div className="intake-toast" onClick={() => setAuthToast("")}>
+          {authToast}
+        </div>
+      )}
 
       {/* Resume banner */}
       {showResume && store.hasSavedProgress && (
@@ -262,6 +327,22 @@ export default function IntakeWizard({ locale }: { locale: Locale }) {
           </button>
         )}
       </div>
+
+      {/* Save & finish later */}
+      <button className="intake-savelater" onClick={() => setAuthModal("save")}>
+        <Save className="w-4 h-4" />
+        {a.saveLater}
+      </button>
+
+      {authModal && (
+        <AuthPanel
+          mode={authModal}
+          defaultEmail={(answers.email as string) || authEmail || ""}
+          t={a}
+          onClose={() => setAuthModal(null)}
+          onAuthed={handleAuthed}
+        />
+      )}
     </div>
   );
 }

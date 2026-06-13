@@ -926,3 +926,106 @@ body {
 .intake-sdot.cur {
   background: linear-gradient(90deg, var(--color-purple-600), var(--color-gold-500));
 }
+
+/* Intake — auth (save & finish later / login) */
+.intake-authbar {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--color-slate-500);
+  margin-bottom: 1rem;
+}
+.intake-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-purple-600);
+  font-weight: 700;
+  cursor: pointer;
+}
+.intake-link:hover { text-decoration: underline; }
+.intake-toast {
+  background: var(--color-purple-600);
+  color: white;
+  border-radius: 12px;
+  padding: 0.7rem 1rem;
+  text-align: center;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+.intake-savelater {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 1.25rem auto 0;
+  color: var(--color-slate-500);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0.5rem;
+}
+.intake-savelater:hover { color: var(--color-purple-700); }
+
+/* Intake — auth modal */
+.intake-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 10, 40, 0.5);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 100;
+}
+.intake-modal {
+  position: relative;
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+.intake-modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: var(--color-slate-400);
+  cursor: pointer;
+}
+.intake-modal-close:hover { color: var(--color-slate-700); }
+.intake-modal-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: var(--color-purple-50);
+  color: var(--color-purple-600);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1rem;
+}
+.intake-modal h3 {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--color-slate-900);
+}
+.intake-modal-body {
+  color: var(--color-slate-500);
+  font-size: 0.92rem;
+  margin: 0.5rem 0 1.25rem;
+  line-height: 1.5;
+}
+.intake-modal .form-input {
+  margin-bottom: 0.75rem;
+  text-align: center;
+}
+.intake-modal-btn { width: 100%; justify-content: center; }
+.intake-modal-done h3 { margin-top: 0.5rem; }
+.intake-modal-done p {
+  color: var(--color-slate-500);
+  margin: 0.5rem 0 1.25rem;
+}

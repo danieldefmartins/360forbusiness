@@ -54,6 +54,8 @@ export interface IntakeStore {
   commit: (status?: "in_progress" | "completed") => Promise<boolean>;
   /** Clear local + remote progress markers and restart. */
   reset: () => void;
+  /** Load a submission fetched from the server (e.g. after logging in to resume). */
+  loadFrom: (id: string, answers: Answers, step: number) => void;
 }
 
 export function useIntakeStore(locale: string): IntakeStore {
@@ -153,6 +155,21 @@ export function useIntakeStore(locale: string): IntakeStore {
     );
   }, []);
 
+  const loadFrom = useCallback((newId: string, newAnswers: Answers, step: number) => {
+    setId(newId);
+    setAnswers(newAnswers ?? {});
+    setStepIndex(step ?? 0);
+    setHasSavedProgress(false);
+    try {
+      localStorage.setItem(
+        LS_KEY,
+        JSON.stringify({ id: newId, answers: newAnswers ?? {}, stepIndex: step ?? 0 }),
+      );
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   return {
     id,
     answers,
@@ -164,5 +181,6 @@ export function useIntakeStore(locale: string): IntakeStore {
     goToStep,
     commit,
     reset,
+    loadFrom,
   };
 }

@@ -13,7 +13,8 @@ const SUPABASE_ANON_KEY =
   "sb_publishable_G4L64iqx6Duzq2cx9h7D4A_qUBK8S9r";
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: { persistSession: false },
+  // Persist the session so a logged-in client can resume their application later.
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true },
 });
 
 export const INTAKE_TABLE = "marketing_intake_submissions";
