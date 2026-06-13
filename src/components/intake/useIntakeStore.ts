@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { supabase, INTAKE_TABLE } from "@/lib/supabase";
+import { supabase } from "@/lib/supabase";
 import type { Answers } from "./steps.config";
 
 /* Hydrating client state from localStorage requires setState inside a mount
@@ -118,7 +118,9 @@ export function useIntakeStore(locale: string): IntakeStore {
         ...promotedColumns(a),
       };
       if (status === "completed") row.completed_at = new Date().toISOString();
-      const { error } = await supabase.from(INTAKE_TABLE).upsert(row, { onConflict: "id" });
+      // Persist via the save_intake RPC (SECURITY DEFINER) — a direct table upsert
+      // with the publishable anon key is blocked by RLS/role handling on this project.
+      const { error } = await supabase.rpc("save_intake", { p_row: row });
       setSaveStatus(error ? "error" : "saved");
       return !error;
     },
