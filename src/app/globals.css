@@ -899,3 +899,30 @@ body {
 .intake-color-row .form-input {
   flex: 1;
 }
+
+/* Intake — section stepper */
+.intake-section-cur {
+  color: var(--color-purple-700);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 800;
+}
+.intake-sdots {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  margin: 0 0 0.6rem;
+}
+.intake-sdot {
+  flex: 1;
+  height: 5px;
+  border-radius: 999px;
+  background: var(--color-slate-200);
+  transition: all 0.3s ease;
+}
+.intake-sdot.done {
+  background: var(--color-purple-400);
+}
+.intake-sdot.cur {
+  background: linear-gradient(90deg, var(--color-purple-600), var(--color-gold-500));
+}

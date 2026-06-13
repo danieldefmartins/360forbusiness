@@ -30,12 +30,15 @@ import {
   HeartHandshake,
   PartyPopper,
   Shapes,
+  Share2,
+  ShieldCheck,
+  MessageSquare,
   PartyPopper as Celebrate,
   type LucideIcon,
 } from "lucide-react";
 import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
 import { getIntakeContent } from "./content";
-import { STEPS, visibleFields, isStepComplete, type FieldConfig } from "./steps.config";
+import { STEPS, visibleFields, isStepComplete, sectionOrder, type FieldConfig } from "./steps.config";
 import { useIntakeStore } from "./useIntakeStore";
 import FieldRenderer from "./FieldRenderer";
 
@@ -54,6 +57,9 @@ const STEP_ICONS: Record<string, LucideIcon> = {
   Gift,
   Rocket,
   CheckCircle2,
+  Share2,
+  ShieldCheck,
+  MessageSquare,
 };
 
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
@@ -80,6 +86,9 @@ export default function IntakeWizard({ locale }: { locale: Locale }) {
   const step = STEPS[stepIndex];
   const stepText = c.steps[stepIndex];
   const StepIcon = STEP_ICONS[step.icon] ?? Sparkles;
+  const sections = sectionOrder();
+  const curSectionIdx = sections.indexOf(step.section);
+  const sectionName = (id: string) => (c.sections as Record<string, string>)[id] ?? id;
   const complete = isStepComplete(step, answers);
   const isLast = stepIndex === STEPS.length - 1;
   const progress = Math.round(((stepIndex + 1) / STEPS.length) * 100);
@@ -165,13 +174,26 @@ export default function IntakeWizard({ locale }: { locale: Locale }) {
         </div>
       )}
 
-      {/* Progress */}
+      {/* Progress + section stepper */}
       <div className="intake-progress">
         <div className="intake-progress-meta">
           <span>
+            <strong className="intake-section-cur">{sectionName(step.section)}</strong>
+            {" · "}
             {c.nav.step} {stepIndex + 1} {c.nav.of} {STEPS.length}
           </span>
           <SaveBadge status={saveStatus} c={c} />
+        </div>
+        <div className="intake-sdots">
+          {sections.map((sec, i) => (
+            <span
+              key={sec}
+              title={sectionName(sec)}
+              className={`intake-sdot ${i < curSectionIdx ? "done" : ""} ${
+                i === curSectionIdx ? "cur" : ""
+              }`}
+            />
+          ))}
         </div>
         <div className="intake-progress-track">
           <div className="intake-progress-fill" style={{ width: `${progress}%` }} />

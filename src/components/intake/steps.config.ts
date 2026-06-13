@@ -1,7 +1,8 @@
 /**
  * Structural definition of the intake wizard — language-agnostic.
  * Field text/labels/options live in content.ts (keyed by the same field `id`).
- * Branching lives here via `showIf`.
+ * Branching lives here via `showIf`. Steps are grouped into `section`s (contiguous)
+ * for the section progress bar.
  *
  * Two special steps are rendered by the wizard itself, not by the generic field list:
  *   - "category"  → the opening category picker (writes answers.category)
@@ -38,9 +39,23 @@ export interface FieldConfig {
 export interface StepConfig {
   id: string; // matches a content.steps id
   icon: string; // lucide icon name (resolved in the wizard)
+  section: string; // section id (for the section progress bar) — see content.sections
   /** "category" and "review" are handled specially; others render `fields`. */
   kind?: "category" | "review";
   fields: FieldConfig[];
+}
+
+/** Ordered, de-duplicated list of section ids as they appear in STEPS. */
+export function sectionOrder(): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const s of STEPS) {
+    if (!seen.has(s.section)) {
+      seen.add(s.section);
+      out.push(s.section);
+    }
+  }
+  return out;
 }
 
 const hasName = (a: Answers) => a.has_business_name === true;
@@ -49,10 +64,11 @@ const isCat = (id: string) => (a: Answers) => a.category === id;
 const wantsPackage = (a: Answers) => a.want_package === true;
 
 export const STEPS: StepConfig[] = [
-  // Capture the essentials FIRST so an abandoned form still leaves us a lead.
+  // ── Contact ── capture the essentials FIRST so an abandoned form still leaves us a lead.
   {
     id: "lead",
     icon: "Phone",
+    section: "contact",
     fields: [
       { id: "contact_name", type: "text", half: true },
       { id: "phone", type: "tel", half: true },
@@ -60,15 +76,16 @@ export const STEPS: StepConfig[] = [
     ],
   },
 
-  { id: "category", icon: "LayoutGrid", kind: "category", fields: [] },
+  // ── Business ──
+  { id: "category", icon: "LayoutGrid", section: "business", kind: "category", fields: [] },
 
   {
     id: "name",
     icon: "Sparkles",
+    section: "business",
     fields: [
       { id: "has_business_name", type: "yesno" },
       { id: "business_name", type: "text", showIf: hasName },
-      // ── "No" branch: name-discovery questions, then the flow rejoins at step 2 ──
       { id: "name_what", type: "textarea", showIf: noName },
       { id: "name_audience", type: "text", showIf: noName },
       { id: "name_vibe", type: "multiselect", showIf: noName },
@@ -81,11 +98,11 @@ export const STEPS: StepConfig[] = [
   {
     id: "general",
     icon: "Building2",
+    section: "business",
     fields: [
       { id: "tagline", type: "text", optional: true },
       { id: "business_stage", type: "select", half: true },
       { id: "employees", type: "select", half: true },
-      // "What do you sell?" — a checklist tailored to the chosen category…
       { id: "offer_home_construction", type: "multiselect", showIf: isCat("home_construction") },
       { id: "offer_food_restaurant", type: "multiselect", showIf: isCat("food_restaurant") },
       { id: "offer_retail_ecom", type: "multiselect", showIf: isCat("retail_ecom") },
@@ -95,10 +112,8 @@ export const STEPS: StepConfig[] = [
       { id: "offer_faith_nonprofit", type: "multiselect", showIf: isCat("faith_nonprofit") },
       { id: "offer_events", type: "multiselect", showIf: isCat("events") },
       { id: "offer_other", type: "textarea", showIf: isCat("other") },
-      // …plus a free-text box for anything not on the list (hidden for "other").
       { id: "offerings", type: "text", optional: true, showIf: (a) => !!a.category && a.category !== "other" },
       { id: "usp", type: "textarea" },
-      // Service area: ZIP + a "how far" picker + optional specific areas (pick, don't type)
       { id: "service_zip", type: "text", half: true },
       { id: "service_radius", type: "select", half: true },
       { id: "service_areas", type: "areas", optional: true },
@@ -106,8 +121,48 @@ export const STEPS: StepConfig[] = [
   },
 
   {
+    id: "deepdive",
+    icon: "Layers",
+    section: "business",
+    fields: [
+      { id: "hc_project_types", type: "multiselect", showIf: isCat("home_construction") },
+      { id: "hc_project_value", type: "select", half: true, showIf: isCat("home_construction") },
+      { id: "hc_licensed", type: "yesno", showIf: isCat("home_construction") },
+      { id: "hc_radius", type: "text", showIf: isCat("home_construction") },
+      { id: "fr_cuisine", type: "text", showIf: isCat("food_restaurant") },
+      { id: "fr_service", type: "multiselect", showIf: isCat("food_restaurant") },
+      { id: "fr_menu_url", type: "url", optional: true, showIf: isCat("food_restaurant") },
+      { id: "fr_online_ordering", type: "yesno", showIf: isCat("food_restaurant") },
+      { id: "re_products", type: "textarea", showIf: isCat("retail_ecom") },
+      { id: "re_platform", type: "select", half: true, showIf: isCat("retail_ecom") },
+      { id: "re_aov", type: "select", half: true, showIf: isCat("retail_ecom") },
+      { id: "re_instore", type: "yesno", showIf: isCat("retail_ecom") },
+      { id: "ps_services", type: "textarea", showIf: isCat("professional_services") },
+      { id: "ps_clients", type: "select", half: true, showIf: isCat("professional_services") },
+      { id: "ps_appointments", type: "yesno", showIf: isCat("professional_services") },
+      { id: "ps_certs", type: "text", optional: true, showIf: isCat("professional_services") },
+      { id: "hw_services", type: "textarea", showIf: isCat("health_wellness") },
+      { id: "hw_booking", type: "select", half: true, showIf: isCat("health_wellness") },
+      { id: "hw_practitioners", type: "select", half: true, showIf: isCat("health_wellness") },
+      { id: "hw_memberships", type: "yesno", showIf: isCat("health_wellness") },
+      { id: "rs_type", type: "multiselect", showIf: isCat("real_estate") },
+      { id: "rs_market", type: "text", showIf: isCat("real_estate") },
+      { id: "rs_brokerage", type: "text", optional: true, showIf: isCat("real_estate") },
+      { id: "fn_mission", type: "textarea", showIf: isCat("faith_nonprofit") },
+      { id: "fn_size", type: "select", half: true, showIf: isCat("faith_nonprofit") },
+      { id: "fn_events", type: "yesno", showIf: isCat("faith_nonprofit") },
+      { id: "fn_donations", type: "yesno", showIf: isCat("faith_nonprofit") },
+      { id: "ev_types", type: "textarea", showIf: isCat("events") },
+      { id: "ev_frequency", type: "select", showIf: isCat("events") },
+      { id: "ev_ticketing", type: "yesno", showIf: isCat("events") },
+      { id: "ot_describe", type: "textarea", showIf: isCat("other") },
+    ],
+  },
+
+  {
     id: "owners",
     icon: "User",
+    section: "business",
     fields: [
       { id: "owner_name", type: "text", optional: true, half: true },
       { id: "owner_role", type: "text", optional: true, half: true },
@@ -120,6 +175,7 @@ export const STEPS: StepConfig[] = [
   {
     id: "contact",
     icon: "Mail",
+    section: "business",
     fields: [
       { id: "business_email", type: "email", optional: true, half: true },
       { id: "preferred_contact", type: "select", half: true },
@@ -130,33 +186,18 @@ export const STEPS: StepConfig[] = [
   {
     id: "presence",
     icon: "MapPin",
+    section: "business",
     fields: [
       { id: "assets", type: "multiselect" },
       { id: "locations_detail", type: "textarea", optional: true },
     ],
   },
 
-  {
-    id: "online",
-    icon: "Globe",
-    fields: [
-      { id: "website_url", type: "url", optional: true, half: true },
-      { id: "website_feeling", type: "select", optional: true, half: true },
-      { id: "instagram", type: "text", optional: true, half: true },
-      { id: "facebook", type: "text", optional: true, half: true },
-      { id: "tiktok", type: "text", optional: true, half: true },
-      { id: "youtube", type: "text", optional: true, half: true },
-      { id: "linkedin", type: "text", optional: true, half: true },
-      { id: "google_business", type: "select", optional: true, half: true },
-      { id: "reviews_status", type: "text", optional: true },
-      // Optional login access so the agency can post/manage (handled securely — see edge fn)
-      { id: "social_logins", type: "logins", optional: true },
-    ],
-  },
-
+  // ── Branding ──
   {
     id: "assets",
     icon: "ImagePlus",
+    section: "branding",
     fields: [
       { id: "media_files", type: "file", optional: true, max: 5 },
       { id: "media_links", type: "textarea", optional: true },
@@ -166,56 +207,39 @@ export const STEPS: StepConfig[] = [
     ],
   },
 
+  // ── Online ──
   {
-    id: "deepdive",
-    icon: "Layers",
+    id: "online",
+    icon: "Globe",
+    section: "online",
     fields: [
-      // home_construction
-      { id: "hc_project_types", type: "multiselect", showIf: isCat("home_construction") },
-      { id: "hc_project_value", type: "select", half: true, showIf: isCat("home_construction") },
-      { id: "hc_licensed", type: "yesno", showIf: isCat("home_construction") },
-      { id: "hc_radius", type: "text", showIf: isCat("home_construction") },
-      // food_restaurant
-      { id: "fr_cuisine", type: "text", showIf: isCat("food_restaurant") },
-      { id: "fr_service", type: "multiselect", showIf: isCat("food_restaurant") },
-      { id: "fr_menu_url", type: "url", optional: true, showIf: isCat("food_restaurant") },
-      { id: "fr_online_ordering", type: "yesno", showIf: isCat("food_restaurant") },
-      // retail_ecom
-      { id: "re_products", type: "textarea", showIf: isCat("retail_ecom") },
-      { id: "re_platform", type: "select", half: true, showIf: isCat("retail_ecom") },
-      { id: "re_aov", type: "select", half: true, showIf: isCat("retail_ecom") },
-      { id: "re_instore", type: "yesno", showIf: isCat("retail_ecom") },
-      // professional_services
-      { id: "ps_services", type: "textarea", showIf: isCat("professional_services") },
-      { id: "ps_clients", type: "select", half: true, showIf: isCat("professional_services") },
-      { id: "ps_appointments", type: "yesno", showIf: isCat("professional_services") },
-      { id: "ps_certs", type: "text", optional: true, showIf: isCat("professional_services") },
-      // health_wellness
-      { id: "hw_services", type: "textarea", showIf: isCat("health_wellness") },
-      { id: "hw_booking", type: "select", half: true, showIf: isCat("health_wellness") },
-      { id: "hw_practitioners", type: "select", half: true, showIf: isCat("health_wellness") },
-      { id: "hw_memberships", type: "yesno", showIf: isCat("health_wellness") },
-      // real_estate
-      { id: "rs_type", type: "multiselect", showIf: isCat("real_estate") },
-      { id: "rs_market", type: "text", showIf: isCat("real_estate") },
-      { id: "rs_brokerage", type: "text", optional: true, showIf: isCat("real_estate") },
-      // faith_nonprofit
-      { id: "fn_mission", type: "textarea", showIf: isCat("faith_nonprofit") },
-      { id: "fn_size", type: "select", half: true, showIf: isCat("faith_nonprofit") },
-      { id: "fn_events", type: "yesno", showIf: isCat("faith_nonprofit") },
-      { id: "fn_donations", type: "yesno", showIf: isCat("faith_nonprofit") },
-      // events
-      { id: "ev_types", type: "textarea", showIf: isCat("events") },
-      { id: "ev_frequency", type: "select", showIf: isCat("events") },
-      { id: "ev_ticketing", type: "yesno", showIf: isCat("events") },
-      // other
-      { id: "ot_describe", type: "textarea", showIf: isCat("other") },
+      { id: "website_url", type: "url", optional: true, half: true },
+      { id: "website_feeling", type: "select", optional: true, half: true },
+      { id: "google_business", type: "select", optional: true, half: true },
+      { id: "reviews_status", type: "text", optional: true, half: true },
     ],
   },
 
+  // ── Social & Access ──
+  {
+    id: "social",
+    icon: "Share2",
+    section: "social",
+    fields: [
+      { id: "instagram", type: "text", optional: true, half: true },
+      { id: "facebook", type: "text", optional: true, half: true },
+      { id: "tiktok", type: "text", optional: true, half: true },
+      { id: "youtube", type: "text", optional: true, half: true },
+      { id: "linkedin", type: "text", optional: true, half: true },
+      { id: "social_logins", type: "logins", optional: true },
+    ],
+  },
+
+  // ── Marketing ──
   {
     id: "goals",
     icon: "Target",
+    section: "marketing",
     fields: [
       { id: "primary_goal", type: "select" },
       { id: "ideal_customer", type: "textarea" },
@@ -233,9 +257,9 @@ export const STEPS: StepConfig[] = [
   {
     id: "package",
     icon: "Gift",
+    section: "marketing",
     fields: [
       { id: "want_package", type: "yesno" },
-      // Details we need to actually deliver the package (shown only if they want it):
       { id: "pkg_colors", type: "text", showIf: wantsPackage },
       { id: "pkg_logo_have", type: "yesno", showIf: wantsPackage },
       { id: "pkg_logo_files", type: "file", optional: true, showIf: wantsPackage },
@@ -249,13 +273,50 @@ export const STEPS: StepConfig[] = [
   {
     id: "services",
     icon: "Rocket",
+    section: "marketing",
     fields: [
       { id: "services_interested", type: "multiselect" },
       { id: "anything_else", type: "textarea", optional: true },
     ],
   },
 
-  { id: "review", icon: "CheckCircle2", kind: "review", fields: [] },
+  // ── Text Messaging (A2P 10DLC) — required so we can run SMS automation ──
+  {
+    id: "a2p_business",
+    icon: "ShieldCheck",
+    section: "messaging",
+    fields: [
+      { id: "a2p_legal_name", type: "text" },
+      { id: "a2p_business_type", type: "select", half: true },
+      { id: "a2p_tax_id", type: "text", half: true },
+      { id: "a2p_industry", type: "select", optional: true, half: true },
+      { id: "a2p_reg_state", type: "text", optional: true, half: true },
+      { id: "a2p_street", type: "text" },
+      { id: "a2p_city", type: "text", half: true },
+      { id: "a2p_state", type: "text", half: true },
+      { id: "a2p_zip", type: "text", half: true },
+      { id: "a2p_country", type: "text", optional: true, half: true },
+    ],
+  },
+
+  {
+    id: "a2p_campaign",
+    icon: "MessageSquare",
+    section: "messaging",
+    fields: [
+      { id: "a2p_rep_name", type: "text", half: true },
+      { id: "a2p_rep_title", type: "text", optional: true, half: true },
+      { id: "a2p_rep_email", type: "email", half: true },
+      { id: "a2p_rep_phone", type: "tel", half: true },
+      { id: "a2p_area_code", type: "text", half: true },
+      { id: "a2p_use_case", type: "select", half: true },
+      { id: "a2p_sample", type: "textarea", optional: true },
+      { id: "a2p_optin", type: "textarea", optional: true },
+    ],
+  },
+
+  // ── Review ──
+  { id: "review", icon: "CheckCircle2", section: "review", kind: "review", fields: [] },
 ];
 
 /** Fields visible for a step given the current answers (applies showIf). */
