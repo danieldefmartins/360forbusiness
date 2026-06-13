@@ -34,8 +34,8 @@ function promotedColumns(a: Answers) {
     has_business_name:
       typeof a.has_business_name === "boolean" ? (a.has_business_name as boolean) : null,
     business_name: (a.business_name as string) ?? null,
-    contact_name: (a.owner_name as string) ?? null,
-    email: (a.business_email as string) ?? null,
+    contact_name: (a.contact_name as string) ?? (a.owner_name as string) ?? null,
+    email: (a.email as string) ?? (a.business_email as string) ?? null,
     phone: (a.phone as string) ?? null,
   };
 }

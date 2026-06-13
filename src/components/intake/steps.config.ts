@@ -49,6 +49,17 @@ const isCat = (id: string) => (a: Answers) => a.category === id;
 const wantsPackage = (a: Answers) => a.want_package === true;
 
 export const STEPS: StepConfig[] = [
+  // Capture the essentials FIRST so an abandoned form still leaves us a lead.
+  {
+    id: "lead",
+    icon: "Phone",
+    fields: [
+      { id: "contact_name", type: "text", half: true },
+      { id: "phone", type: "tel", half: true },
+      { id: "email", type: "email" },
+    ],
+  },
+
   { id: "category", icon: "LayoutGrid", kind: "category", fields: [] },
 
   {
@@ -98,7 +109,7 @@ export const STEPS: StepConfig[] = [
     id: "owners",
     icon: "User",
     fields: [
-      { id: "owner_name", type: "text", half: true },
+      { id: "owner_name", type: "text", optional: true, half: true },
       { id: "owner_role", type: "text", optional: true, half: true },
       { id: "owner_story", type: "textarea", optional: true },
       { id: "owner_face", type: "yesno" },
@@ -110,8 +121,7 @@ export const STEPS: StepConfig[] = [
     id: "contact",
     icon: "Mail",
     fields: [
-      { id: "business_email", type: "email", half: true },
-      { id: "phone", type: "tel", half: true },
+      { id: "business_email", type: "email", optional: true, half: true },
       { id: "preferred_contact", type: "select", half: true },
       { id: "hours", type: "text", optional: true, half: true },
     ],
