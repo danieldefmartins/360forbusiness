@@ -128,6 +128,11 @@ export default function Footer({
                   </Link>
                 </li>
                 <li>
+                  <Link href={`/${locale}/apps/`} className="text-slate-400 hover:text-white text-sm transition-colors">
+                    {dict.footer.appsLink}
+                  </Link>
+                </li>
+                <li>
                   <Link href={`/${locale}/blog/`} className="text-slate-400 hover:text-white text-sm transition-colors">
                     Blog
                   </Link>

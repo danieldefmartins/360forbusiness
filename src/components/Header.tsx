@@ -30,6 +30,7 @@ export default function Header({
     { href: `/${locale}/our-process/`, label: dict.nav.process },
     { href: `/${locale}/crm/`, label: dict.nav.crm },
     { href: `/${locale}/portfolio/`, label: dict.nav.portfolio },
+    { href: `/${locale}/apps/`, label: dict.nav.apps },
     { href: `/${locale}/about/`, label: dict.nav.about },
     { href: `/${locale}/pricing/`, label: locale === "pt" ? "Precos" : locale === "es" ? "Precios" : "Pricing" },
     { href: `/${locale}/blog/`, label: "Blog" },
