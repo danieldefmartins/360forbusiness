@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, ArrowRight } from "lucide-react";
 
-const CRM_LOGIN_URL = "https://360crm.up.railway.app";
+const CRM_LOGIN_URL = "https://app.get360crm.com";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/en";
 import LanguageSwitcher from "./LanguageSwitcher";
