@@ -9,6 +9,7 @@ const en = {
     apps: "Apps",
     contact: "Contact",
     getStarted: "Get Started",
+    login: "Client Login",
   },
   hero: {
     eyebrow: "Miami's All-In-One Marketing Agency",

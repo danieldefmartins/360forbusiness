@@ -11,6 +11,7 @@ const es: Dictionary = {
     apps: "Apps",
     contact: "Contacto",
     getStarted: "Empezar",
+    login: "Iniciar sesión",
   },
   hero: {
     eyebrow: "La Agencia de Marketing Todo-en-Uno de Miami",

@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, ArrowRight } from "lucide-react";
+
+const CRM_LOGIN_URL = "https://360crm.up.railway.app";
 import type { Locale } from "@/i18n/config";
 import type { Dictionary } from "@/i18n/en";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -81,6 +83,12 @@ export default function Header({
               <div className="hidden md:block">
                 <LanguageSwitcher current={locale} />
               </div>
+              <a
+                href={CRM_LOGIN_URL}
+                className="hidden md:inline-flex text-[13px] font-semibold text-white/70 hover:text-white transition-colors uppercase tracking-wide"
+              >
+                {dict.nav.login}
+              </a>
               <Link
                 href={`/${locale}/start/`}
                 className="hidden md:inline-flex items-center gap-2 bg-cta hover:bg-cta-dark text-white font-bold px-6 py-2.5 rounded-lg transition-colors text-sm"
@@ -117,6 +125,12 @@ export default function Header({
                   {link.label}
                 </Link>
               ))}
+              <a
+                href={CRM_LOGIN_URL}
+                className="block py-3 text-base font-medium text-white/80 hover:text-white transition-colors border-b border-white/5"
+              >
+                {dict.nav.login}
+              </a>
               <div className="pt-4 border-t border-white/10 mt-4">
                 <LanguageSwitcher current={locale} />
               </div>
